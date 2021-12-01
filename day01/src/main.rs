@@ -15,14 +15,18 @@ fn number_of_depth_increases(depths: &[usize]) -> usize {
 }
 
 fn sums(depths: &[usize]) -> Vec<usize> {
-    depths.windows(3).map(|window| window.iter().sum()).collect()
+    depths
+        .windows(3)
+        .map(|window| window.iter().sum())
+        .collect()
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reader = BufReader::new(File::open("input")?);
     let lines = reader
         .lines()
-        .map(|line| line.unwrap().parse::<usize>())
+        .map(|line| line.map(|line| line.parse::<usize>()))
+        .flatten()
         .collect::<Result<Vec<usize>, _>>()?;
 
     println!("{}", number_of_depth_increases(&lines));
