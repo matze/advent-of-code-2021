@@ -2,16 +2,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 fn number_of_depth_increases(depths: &[usize]) -> usize {
-    depths.windows(2).fold(
-        0,
-        |acc, window| {
-            if window[1] > window[0] {
-                acc + 1
-            } else {
-                acc
-            }
-        },
-    )
+    depths.windows(2).filter(|w| w[1] > w[0]).count()
 }
 
 fn sums(depths: &[usize]) -> Vec<usize> {
