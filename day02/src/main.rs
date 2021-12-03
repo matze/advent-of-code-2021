@@ -103,11 +103,11 @@ fn aim(commands: &[Command]) -> Vector {
 
     for command in commands {
         match command {
-            Command::Down(x) => { aim += x },
-            Command::Up(x) => { aim -= x },
+            Command::Down(x) => aim += x,
+            Command::Up(x) => aim -= x,
             Command::Forward(x) => {
                 position = position + Vector::new(*x, x * aim);
-            },
+            }
         };
     }
 
