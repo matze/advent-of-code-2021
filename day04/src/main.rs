@@ -1,8 +1,8 @@
-use std::io::BufReader;
-use std::fs::File;
 use std::default::Default;
 use std::error::Error;
 use std::fmt;
+use std::fs::File;
+use std::io::BufReader;
 use std::io::{BufRead, Lines};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -118,7 +118,7 @@ impl<const N: usize> Puzzle<N> {
     fn process_bingo<B: BufRead>(lines: &mut Lines<B>) -> Result<(usize, usize), ParseError> {
         let input: Vec<usize> = lines
             .next()
-            .ok_or_else(|| ParseError {})?
+            .ok_or(ParseError {})?
             .map_err(|_| ParseError {})?
             .split(',')
             .map(|s| s.parse())
@@ -127,13 +127,8 @@ impl<const N: usize> Puzzle<N> {
 
         let mut boards: Vec<Board<N>> = vec![];
 
-        loop {
-            if let Some(_) = lines.next() {
-                boards.push(Board::try_from(lines)?);
-            }
-            else {
-                break;
-            }
+        while let Some(_) = lines.next() {
+            boards.push(Board::try_from(lines)?);
         }
 
         let mut sums = vec![];
@@ -148,7 +143,10 @@ impl<const N: usize> Puzzle<N> {
             }
         }
 
-        Ok((sums[0], *sums.last().unwrap()))
+        Ok((
+            *sums.first().ok_or(ParseError {})?,
+            *sums.last().ok_or(ParseError {})?,
+        ))
     }
 }
 
