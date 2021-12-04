@@ -1,7 +1,7 @@
 use std::convert::{From, TryFrom};
+use std::default::Default;
 use std::error::Error;
 use std::fmt;
-use std::default::Default;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::ops::Add;
