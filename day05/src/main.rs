@@ -24,12 +24,6 @@ impl Point {
     fn new(x: usize, y: usize) -> Self {
         Self { x, y }
     }
-
-    fn diagonal(&self, other: &Point) -> bool {
-        (self.x as isize - other.x as isize).abs() == (self.y as isize - other.y as isize).abs()
-            && self.x != other.x
-            && self.y != other.y
-    }
 }
 
 impl Error for ParseError {}
@@ -37,6 +31,14 @@ impl Error for ParseError {}
 struct Segment {
     start: Point,
     end: Point,
+}
+
+impl Segment {
+    fn diagonal(&self) -> bool {
+        (self.start.x as isize - self.end.x as isize).abs() == (self.start.y as isize - self.end.y as isize).abs()
+            && self.start.x != self.end.x
+            && self.start.y != self.end.y
+    }
 }
 
 impl TryFrom<&str> for Segment {
@@ -118,7 +120,7 @@ where
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reader = BufReader::new(File::open("input")?);
     let segments = parse_segments(&mut reader.lines())?;
-    println!("{}", solve(segments.iter().filter(|&s| !s.start.diagonal(&s.end))));
+    println!("{}", solve(segments.iter().filter(|&s| !s.diagonal())));
     println!("{}", solve(segments.iter()));
 
     Ok(())
@@ -153,7 +155,7 @@ mod tests {
         );
 
         let segments = parse_segments(&mut cursor.lines())?;
-        assert_eq!(solve(segments.iter().filter(|&s| !s.start.diagonal(&s.end))), 5);
+        assert_eq!(solve(segments.iter().filter(|&s| !s.diagonal())), 5);
         assert_eq!(solve(segments.iter()), 12);
 
         Ok(())
