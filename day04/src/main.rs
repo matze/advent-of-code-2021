@@ -7,17 +7,8 @@ use std::io::{BufRead, Lines};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Entry {
-    Marked(usize),
+    Marked,
     Unmarked(usize),
-}
-
-impl Entry {
-    fn number(&self) -> usize {
-        match self {
-            Entry::Marked(x) => *x,
-            Entry::Unmarked(x) => *x,
-        }
-    }
 }
 
 impl Default for Entry {
@@ -70,14 +61,14 @@ impl<const N: usize> Board<N> {
         self.entries
             .iter_mut()
             .flat_map(|r| r.iter_mut())
-            .filter(|e| e.number() == number)
-            .for_each(|e| *e = Entry::Marked(number));
+            .filter(|e| matches!(e, Entry::Unmarked(x) if *x == number))
+            .for_each(|e| *e = Entry::Marked);
     }
 
     fn complete(&self) -> bool {
         // Cool!
         for row in self.entries.iter() {
-            if row.iter().all(|&e| matches!(e, Entry::Marked(_))) {
+            if row.iter().all(|&e| matches!(e, Entry::Marked)) {
                 return true;
             }
         }
@@ -176,7 +167,7 @@ mod tests {
         assert_eq!(board.entries[1][2], Entry::Unmarked(23));
 
         board.mark(23);
-        assert_eq!(board.entries[1][2], Entry::Marked(23));
+        assert_eq!(board.entries[1][2], Entry::Marked);
         assert_eq!(board.unmarked_sum(), 277);
 
         assert!(!board.complete());
