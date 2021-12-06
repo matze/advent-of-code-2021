@@ -117,6 +117,70 @@ fn common_bits<const N: usize>(lines: &[String]) -> Result<BitCounts<N>, BitCoun
     Ok(result)
 }
 
+fn o2_generator_rating<const N: usize>(bits: &[BitCounts<N>]) -> usize {
+    let mut filtered = bits.iter().collect::<Vec<_>>();
+    let mut current = 0;
+
+    while filtered.len() != 1 {
+        let mut ones = 0;
+        let mut zeros = 0;
+
+        filtered.iter().for_each(|x| match x.data[current] {
+            0 => zeros += 1,
+            1 => ones += 1,
+            _ => {}
+        });
+
+        let most_common = if ones > zeros {
+            1
+        } else if zeros > ones {
+            0
+        } else {
+            1
+        };
+
+        filtered = filtered
+            .into_iter()
+            .filter(|x| x.data[current] == most_common)
+            .collect();
+        current += 1;
+    }
+
+    filtered[0].clone().into()
+}
+
+fn co2_scrubber_rating<const N: usize>(bits: &[BitCounts<N>]) -> usize {
+    let mut filtered = bits.iter().collect::<Vec<_>>();
+    let mut current = 0;
+
+    while filtered.len() != 1 {
+        let mut ones = 0;
+        let mut zeros = 0;
+
+        filtered.iter().for_each(|x| match x.data[current] {
+            0 => zeros += 1,
+            1 => ones += 1,
+            _ => {}
+        });
+
+        let least_common = if ones < zeros {
+            1
+        } else if zeros < ones {
+            0
+        } else {
+            0
+        };
+
+        filtered = filtered
+            .into_iter()
+            .filter(|x| x.data[current] == least_common)
+            .collect();
+        current += 1;
+    }
+
+    filtered[0].clone().into()
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reader = BufReader::new(File::open("input")?);
     let lines = reader.lines().collect::<Result<Vec<String>, _>>()?;
@@ -125,6 +189,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let epsilon_rate_count = gamma_rate_count.invert();
     let epsilon_rate: usize = epsilon_rate_count.into();
     println!("{}", gamma_rate * epsilon_rate);
+
+    let bits = lines
+        .iter()
+        .map(|s| BitCounts::<12>::try_from(s))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    println!(
+        "{}",
+        o2_generator_rating(&bits) * co2_scrubber_rating(&bits)
+    );
 
     Ok(())
 }
@@ -180,5 +254,30 @@ mod tests {
         let y: usize = inverted.into();
         assert_eq!(y, 9);
         assert_eq!(x * y, 198);
+    }
+
+    #[test]
+    fn test_o2_co2() {
+        let bits = [
+            "00100".to_string(),
+            "11110".to_string(),
+            "10110".to_string(),
+            "10111".to_string(),
+            "10101".to_string(),
+            "01111".to_string(),
+            "00111".to_string(),
+            "11100".to_string(),
+            "10000".to_string(),
+            "11001".to_string(),
+            "00010".to_string(),
+            "01010".to_string(),
+        ]
+        .iter()
+        .map(|s| BitCounts::<5>::try_from(s))
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
+
+        assert_eq!(o2_generator_rating(&bits), 23);
+        assert_eq!(co2_scrubber_rating(&bits), 10);
     }
 }
