@@ -35,7 +35,8 @@ struct Segment {
 
 impl Segment {
     fn diagonal(&self) -> bool {
-        (self.start.x as isize - self.end.x as isize).abs() == (self.start.y as isize - self.end.y as isize).abs()
+        (self.start.x as isize - self.end.x as isize).abs()
+            == (self.start.y as isize - self.end.y as isize).abs()
             && self.start.x != self.end.x
             && self.start.y != self.end.y
     }
@@ -99,8 +100,20 @@ where
     let mut acc = HashMap::<Point, usize>::new();
 
     for Segment { start, end } in segments {
-        let dx = if start.x > end.x { -1 } else if start.x < end.x { 1 } else { 0 };
-        let dy = if start.y > end.y { -1 } else if start.y < end.y { 1 } else { 0 };
+        let dx = if start.x > end.x {
+            -1
+        } else if start.x < end.x {
+            1
+        } else {
+            0
+        };
+        let dy = if start.y > end.y {
+            -1
+        } else if start.y < end.y {
+            1
+        } else {
+            0
+        };
 
         let mut x = start.x as isize;
         let mut y = start.y as isize;
