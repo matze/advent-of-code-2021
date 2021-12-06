@@ -11,16 +11,13 @@ fn number_of_fish(initial: &str, num_days: usize) -> Result<usize, Box<dyn std::
 
     for _ in 0..num_days {
         let values = stock.clone();
+        let xs = 0..9;
 
-        stock[0] = values[1];
-        stock[1] = values[2];
-        stock[2] = values[3];
-        stock[3] = values[4];
-        stock[4] = values[5];
-        stock[5] = values[6];
-        stock[6] = values[0] + values[7];
-        stock[7] = values[8];
-        stock[8] = values[0];
+        for (i, j) in xs.clone().zip(xs.cycle().skip(1)) {
+            stock[i] = values[j];
+        }
+
+        stock[6] += values[0];
     }
 
     Ok(stock.iter().sum())
