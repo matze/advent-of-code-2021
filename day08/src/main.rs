@@ -51,8 +51,10 @@ fn parse_signal(signal: &[u8]) -> Candidate {
             signal[0], signal[1], signal[2], signal[3], signal[4], signal[5], signal[6],
         ]),
         5 => Candidate::UnknownFive([signal[0], signal[1], signal[2], signal[3], signal[4]]),
-        6 => Candidate::UnknownSix([signal[0], signal[1], signal[2], signal[3], signal[4], signal[5]]),
-        _ => panic!("impossible")
+        6 => Candidate::UnknownSix([
+            signal[0], signal[1], signal[2], signal[3], signal[4], signal[5],
+        ]),
+        _ => panic!("impossible"),
     }
 }
 
@@ -93,24 +95,42 @@ fn part_one(parsed: &[(Input, Output)]) -> usize {
         .map(|(_, output)| {
             output
                 .iter()
-                .filter(|c| !matches!(c, Candidate::One(_) | Candidate::Four(_) | Candidate::Seven(_) | Candidate::Eight(_)))
+                .filter(|c| {
+                    !matches!(
+                        c,
+                        Candidate::One(_)
+                            | Candidate::Four(_)
+                            | Candidate::Seven(_)
+                            | Candidate::Eight(_)
+                    )
+                })
                 .count()
         })
         .sum::<usize>()
 }
 
 fn decode(input: &Input) {
-    let one = input.iter().find(|c| matches!(c, Candidate::One(_))).unwrap();
-    let seven = input.iter().find(|c| matches!(c, Candidate::Seven(_))).unwrap();
+    let one = input
+        .iter()
+        .find(|c| matches!(c, Candidate::One(_)))
+        .unwrap();
+    let seven = input
+        .iter()
+        .find(|c| matches!(c, Candidate::Seven(_)))
+        .unwrap();
 
     let a = match (one, seven) {
         (Candidate::One(one), Candidate::Seven(seven)) => {
             seven.iter().filter(|c| !one.contains(c)).next().unwrap()
-        },
+        }
         _ => panic!("nono"),
     };
 
-    let mut all = input.iter().map(|i| i.data().iter()).flatten().collect::<Vec<_>>();
+    let mut all = input
+        .iter()
+        .map(|i| i.data().iter())
+        .flatten()
+        .collect::<Vec<_>>();
     all.sort();
 
     println!("{:?}", all);
@@ -163,7 +183,9 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
     #[test]
     fn test_decode() -> Result<(), Box<dyn std::error::Error>> {
-        let (input, _output) = parse_line("acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf")?;
+        let (input, _output) = parse_line(
+            "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf",
+        )?;
         decode(&input);
 
         Ok(())
