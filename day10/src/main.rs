@@ -1,5 +1,5 @@
-use std::io::{BufRead, BufReader, Lines};
 use std::fs::File;
+use std::io::{BufRead, BufReader, Lines};
 
 enum Line {
     Corrupt(char),
@@ -81,11 +81,13 @@ fn parse_line(s: &str) -> Line {
 
 fn parse_lines<B: BufRead>(lines: &mut Lines<B>) -> Result<Vec<Line>, std::io::Error> {
     lines
-        .map(|l| l.map(|l| parse_line(&l))).collect::<Result<Vec<_>, _>>()
+        .map(|l| l.map(|l| parse_line(&l)))
+        .collect::<Result<Vec<_>, _>>()
 }
 
 fn solve_part_one(lines: &Vec<Line>) -> usize {
-    lines.iter()
+    lines
+        .iter()
         .map(|l| match l {
             Line::Corrupt(c) => score_incomplete(*c),
             _ => 0,
@@ -95,9 +97,11 @@ fn solve_part_one(lines: &Vec<Line>) -> usize {
 
 fn score_line(line: &Line) -> usize {
     let points: Vec<usize> = match line {
-        Line::Incomplete(stack) => {
-            stack.iter().rev().map(|&c| score_completion(closing(c))).collect()
-        },
+        Line::Incomplete(stack) => stack
+            .iter()
+            .rev()
+            .map(|&c| score_completion(closing(c)))
+            .collect(),
         _ => unreachable!(),
     };
 
@@ -117,7 +121,8 @@ fn solve_part_two(lines: &Vec<Line>) -> usize {
         .filter_map(|l| match l {
             Line::Incomplete(_) => Some(score_line(&l)),
             _ => None,
-        }).collect::<Vec<_>>();
+        })
+        .collect::<Vec<_>>();
 
     scores.sort();
     scores[scores.len() / 2]
