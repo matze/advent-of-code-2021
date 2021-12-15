@@ -25,15 +25,26 @@ fn parse_rule(line: &str) -> Result<(Vec<u8>, u8), ParseError> {
         return Err(ParseError {});
     }
 
-    let output = split.next().ok_or_else(|| ParseError {})?.chars().next().ok_or_else(|| ParseError {})? as u8;
+    let output = split
+        .next()
+        .ok_or_else(|| ParseError {})?
+        .chars()
+        .next()
+        .ok_or_else(|| ParseError {})? as u8;
 
     Ok((input.iter().map(|c| *c).collect(), output))
 }
 
 fn parse<B: BufRead>(lines: &mut Lines<B>) -> Result<(Rules, Vec<u8>), ParseError> {
-    let template = lines.next().ok_or_else(|| ParseError {})?.map_err(|_| ParseError {})?;
+    let template = lines
+        .next()
+        .ok_or_else(|| ParseError {})?
+        .map_err(|_| ParseError {})?;
 
-    lines.next().ok_or_else(|| ParseError {})?.map_err(|_| ParseError {})?;
+    lines
+        .next()
+        .ok_or_else(|| ParseError {})?
+        .map_err(|_| ParseError {})?;
 
     let mut rules = HashMap::new();
 
@@ -111,7 +122,8 @@ BN -> B
 BB -> N
 BC -> B
 CC -> N
-CN -> C"#);
+CN -> C"#,
+        );
 
         let (rules, template) = parse(&mut cursor.lines())?;
         assert_eq!(String::from_utf8_lossy(&template), "NNCB");
@@ -124,10 +136,16 @@ CN -> C"#);
         assert_eq!(String::from_utf8_lossy(&result), "NBCCNBBBCBHCB");
 
         let result = step(&result, &rules);
-        assert_eq!(String::from_utf8_lossy(&result), "NBBBCNCCNBBNBNBBCHBHHBCHB");
+        assert_eq!(
+            String::from_utf8_lossy(&result),
+            "NBBBCNCCNBBNBNBBCHBHHBCHB"
+        );
 
         let result = step(&result, &rules);
-        assert_eq!(String::from_utf8_lossy(&result), "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB");
+        assert_eq!(
+            String::from_utf8_lossy(&result),
+            "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB"
+        );
 
         assert_eq!(solve(&template, &rules, 10), 1588);
         assert_eq!(solve(&template, &rules, 40), 2188189693529);
